@@ -142,7 +142,7 @@ BIC(runs46.lm)
 #runs36.lm has the lowest BIC overall (singles, doubles, triples, home runs, walks => just getting on base are main factors)
 summary(runs36.lm)
 
-
+step(lm(R ~ 0+X1B+X2B+X3B+HR+BB+IBB+HBP+SF+SB+CS), direction="backward")
 
 
 #PROBLEM 2
@@ -177,5 +177,48 @@ anova(RR.aov)
 
 
 
+#PROBLEM 4
+players = cbind(players,RV)
+players = cbind(players,RR)
 
+League.AL = subset(players, players$League=="AL")
+League.NL = subset(players, players$League=="NL")
+
+RV.league.aov = aov(RV ~ League)
+anova(RV.league.aov)
+RR.league.aov = aov(RR ~ League)
+anova(RR.league.aov)
+RV.g1.aov = aov(RV ~ Position==c("C","SS","2B","CF"))
+anova(RV.g1.aov)
+RR.g1.aov = aov(RR ~ Position==c("C","SS","2B","CF"))
+anova(RR.g1.aov)
+RV.g2.aov = aov(RV ~ Position==c("1B","3B","RF","LF"))
+anova(RV.g2.aov)
+RR.g2.aov = aov(RR ~ Position==c("1B","3B","RF","LF"))
+anova(RR.g2.aov)
+
+
+G1.1 = subset(players, players$Position==c("C","SS"))
+G1.2 = subset(players, players$Position==c("2B","CF"))
+G1 = rbind(G1.1,G1.2)
+G1
+
+G2.1 = subset(players, players$Position==c("1B","3B"))
+G2.2 = subset(players, players$Position==c("RF","LF"))
+G2 = rbind(G2.1,G2.2)
+G2
+
+G1rv.aov = aov(G1$RV ~ G1$Position)
+anova(G1rv.aov)
+RR.aov = aov(RR ~ Position)
+anova(RR.aov)
+
+
+
+Rv.position.aov = aov(RV ~ Position==c("1B","3B","RF","SS"))
+anova(Rv.position.aov)
+
+
+Position==c("1B","3B","RF","SS")
+Position
 
