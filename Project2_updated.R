@@ -155,7 +155,13 @@ RR = RV/PA
 players = cbind(players,RV)
 players = cbind(players,RR)
 
+Rp = 0.16037*X1B + 0.096242*X2B + 1.20950*X3B + 1.00580*HR + 0.15345*BB
+players = cbind(players,Rp)
 
+Runs.p = matrix(0,length(Name),2)
+Runs.p[,1]=Name
+Runs.p[,2]=Rp
+write.csv(R, "R.csv")
 
 rv.rr = matrix(0,length(Name),3)
 rv.rr[,1]=playerid
@@ -276,3 +282,79 @@ hoop.aov = aov(HOOP ~ League*Group)
 anova(hoop.aov)
 
 
+
+#PROBLEM 5
+
+Age.lm = lm(RV ~ Age)
+summary(Age.lm)
+Age.aov = aov(RV ~ Age)
+anova(Age.aov)
+
+par(mfrow=c(1,1))
+hist(Age)
+plot(Age, RV, main = "RV vs Age", xlab = "Age", ylab = "RV")
+abline(Age.lm)
+
+
+DH1 = subset(players, players$Position=="DH")
+DH1
+hist(players$HR)
+hist(DH1$HR,xlim = c(0,40))
+?xlim
+
+
+runs.aov = aov(R ~ X3B*HR)
+anova(runs.aov)
+
+
+barplot(R, names.arg = Team, las = 3)
+
+
+PO = matrix(0,length(Team),1)
+for (i in 1:length(Team) ) {
+  if (Team[i] == "Cardinals") {
+    PO[i] = 1
+  }
+  else if (Team[i] == "Dodgers") {
+    PO[i] = 1
+  }
+  else if (Team[i] == "Giants") {
+    PO[i] = 1
+  }
+  else if (Team[i] == "Pirates") {
+    PO[i] = 1
+  }
+  else if (Team[i] == "Tigers") {
+    PO[i] = 1
+  }
+  else if (Team[i] == "Athletics") {
+    PO[i] = 1
+  }
+  else if (Team[i] == "Royals") {
+    PO[i] = 1
+  }
+  else if (Team[i] == "Angels") {
+    PO[i] = 1
+  }
+  else if (Team[i] == "Orioles") {
+    PO[i] = 1
+  }
+  else if (Team[i] == "Nationals") {
+    PO[i] = 1
+  }
+  else {
+    PO[i] = 0
+  }
+}
+baseball = cbind(baseball, PO)
+PO.1 = subset(baseball, baseball$PO == 1)
+PO.2 = subset(baseball, baseball$PO == 0)
+t.test(PO.1$R, PO.2$R, alternative = "greater")
+
+
+?t.test
+
+t.test(R,PO)
+PO.aov = aov(R ~ PO)
+anova(PO.aov)
+baseball
