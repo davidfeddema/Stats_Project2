@@ -13,6 +13,11 @@ write.csv(bb_corr, "corr_1.csv")
 runs1.lm = lm(R ~ 0+X1B+X2B+X3B+HR+BB+IBB+HBP+SF+SB+CS)
 summary(runs1.lm)
 
+qqnorm(residuals(runs1.lm), main="QQ Plot of Residuals")
+qqline(residuals(runs1.lm))
+qqnorm(baseball[,15], main="QQ Plot of Runs")
+qqline(baseball[,15])
+
 
 par(mfrow=c(3,4))
 plot(baseball[,5], residuals(runs1.lm), ylab="Residuals", xlab="Singles",main="Singles Residuals")
@@ -152,6 +157,16 @@ attach(players)
 players
 RV = RBI + R
 RR = RV/PA
+players = cbind(players,RV)
+players = cbind(players,RR)
+
+Rp = 0.16037*X1B + 0.096242*X2B + 1.20950*X3B + 1.00580*HR + 0.15345*BB
+players = cbind(players,Rp)
+
+Runs.p = matrix(0,length(Name),2)
+Runs.p[,1]=Name
+Runs.p[,2]=Rp
+write.csv(R, "R.csv")
 
 rv.rr = matrix(0,length(Name),3)
 rv.rr[,1]=playerid
@@ -172,17 +187,74 @@ TopRR
 #PROBLEM 3
 RV.aov = aov(RV ~ Position)
 anova(RV.aov)
-RR.aov = aov(RR ~ Position)
-anova(RR.aov)
 
+contrasts(players$Position) = c(-1,-1,-1,-1,-1,-1,8,-1,-1)
+contrasts(players$Position) = contr.sum
+Position1.con.lm = lm(RV ~ Position, data=players)
+summary(Position1.con.lm)
+
+pairwise.t.test(RV, Position, p.adj="bon")
 
 
 #PROBLEM 4
-players = cbind(players,RV)
-players = cbind(players,RR)
-
 League.AL = subset(players, players$League=="AL")
 League.NL = subset(players, players$League=="NL")
+League.AL.1B = subset(League.AL, League.AL$Position=="1B")
+League.AL.2B = subset(League.AL, League.AL$Position=="2B")
+League.AL.3B = subset(League.AL, League.AL$Position=="3B")
+League.AL.SS = subset(League.AL, League.AL$Position=="SS")
+League.AL.C = subset(League.AL, League.AL$Position=="C")
+League.AL.LF = subset(League.AL, League.AL$Position=="LF")
+League.AL.CF = subset(League.AL, League.AL$Position=="CF")
+League.AL.RF = subset(League.AL, League.AL$Position=="RF")
+League.AL.DH = subset(League.AL, League.AL$Position=="DH")
+League.NL.1B = subset(League.NL, League.NL$Position=="1B")
+League.NL.2B = subset(League.NL, League.NL$Position=="2B")
+League.NL.3B = subset(League.NL, League.NL$Position=="3B")
+League.NL.SS = subset(League.NL, League.NL$Position=="SS")
+League.NL.C = subset(League.NL, League.NL$Position=="C")
+League.NL.LF = subset(League.NL, League.NL$Position=="LF")
+League.NL.CF = subset(League.NL, League.NL$Position=="CF")
+League.NL.RF = subset(League.NL, League.NL$Position=="RF")
+League.NL.DH = subset(League.NL, League.NL$Position=="DH")
+mean(League.AL.1B$RV)
+mean(League.AL.2B$RV)
+mean(League.AL.3B$RV)
+mean(League.AL.SS$RV)
+mean(League.AL.C$RV)
+mean(League.AL.LF$RV)
+mean(League.AL.CF$RV)
+mean(League.AL.RF$RV)
+mean(League.AL.DH$RV)
+mean(League.NL.1B$RV)
+mean(League.NL.2B$RV)
+mean(League.NL.3B$RV)
+mean(League.NL.SS$RV)
+mean(League.NL.C$RV)
+mean(League.NL.LF$RV)
+mean(League.NL.CF$RV)
+mean(League.NL.RF$RV)
+mean(League.NL.DH$RV)
+mean(League.NL$RV)
+mean(League.AL$RV)
+P.1B = subset(players, players$Position=="1B")
+P.2B = subset(players, players$Position=="2B")
+P.3B = subset(players, players$Position=="3B")
+P.SS = subset(players, players$Position=="SS")
+P.C = subset(players, players$Position=="C")
+P.LF = subset(players, players$Position=="LF")
+P.CF = subset(players, players$Position=="CF")
+P.RF = subset(players, players$Position=="RF")
+P.DH = subset(players, players$Position=="DH")
+mean(P.1B$RV)
+mean(P.2B$RV)
+mean(P.3B$RV)
+mean(P.SS$RV)
+mean(P.C$RV)
+mean(P.LF$RV)
+mean(P.CF$RV)
+mean(P.RF$RV)
+mean(P.DH$RV)
 
 RV.league.aov = aov(RV ~ League)
 anova(RV.league.aov)
@@ -222,3 +294,141 @@ anova(Rv.position.aov)
 Position==c("1B","3B","RF","SS")
 Position
 
+interaction.plot(RV,,ssb, lty=1, col=c(2,3), lwd=3, cex.axis=1.4, cex.lab=1.4)
+
+Position[1:146] == c("C", "SS", "2B","CF")
+Position  =="C" OR "SS"
+?|
+
+for (i in 1:length(Position) ) {
+  if (Position[i] == "C") {
+    Group[i] = 1
+  }
+  else if (Position[i] == "SS") {
+    Group[i] = 1
+  }
+  else if (Position[i] == "2B") {
+    Group[i] = 1
+  }
+  else if (Position[i] == "CF") {
+    Group[i] = 1
+  }
+  else {
+    Group[i] = 2
+  }
+}
+Group
+players = cbind(players,Group)
+
+players
+
+RV1.aov = aov(RV ~ League*Group)
+anova(RV1.aov)
+RVm = median(RV)
+
+HOOP = matrix(0,length(RV),1)
+for (i in 1:length(RV) ) {
+  if (RV[i] > RVm) {
+    HOOP[i] = 1
+  }
+  else {
+    HOOP[i] = 2
+  }
+}
+HOOP
+players = cbind(players,HOOP)
+players
+
+hoop.aov = aov(HOOP ~ League*Group)
+anova(hoop.aov)
+
+Npo1 = subset(League.NL, League.NL$HOOP=="1")
+Npo2 = subset(League.NL, League.NL$HOOP=="2")
+Apo1 = subset(League.AL, League.AL$HOOP=="1")
+Apo2 = subset(League.AL, League.AL$HOOP=="2")
+hoop1 = subset(players, players$HOOP=="1")
+hoop2 = subset(players, players$HOOP=="2")
+length(Npo1$RV)
+length(Npo2$RV)
+length(Apo1$RV)
+length(Apo2$RV)
+length(hoop1$RV)
+length(hoop2$RV)
+
+
+
+#PROBLEM 5
+
+Age.lm = lm(RV ~ Age)
+summary(Age.lm)
+Age.aov = aov(RV ~ Age)
+anova(Age.aov)
+
+par(mfrow=c(1,1))
+hist(Age)
+plot(Age, RV, main = "RV vs Age", xlab = "Age", ylab = "RV")
+abline(Age.lm)
+
+
+DH1 = subset(players, players$Position=="DH")
+DH1
+hist(players$HR)
+hist(DH1$HR,xlim = c(0,40))
+?xlim
+
+
+runs.aov = aov(R ~ X3B*HR)
+anova(runs.aov)
+
+
+barplot(R, names.arg = Team, las = 3)
+
+
+PO = matrix(0,length(Team),1)
+for (i in 1:length(Team) ) {
+  if (Team[i] == "Cardinals") {
+    PO[i] = 1
+  }
+  else if (Team[i] == "Dodgers") {
+    PO[i] = 1
+  }
+  else if (Team[i] == "Giants") {
+    PO[i] = 1
+  }
+  else if (Team[i] == "Pirates") {
+    PO[i] = 1
+  }
+  else if (Team[i] == "Tigers") {
+    PO[i] = 1
+  }
+  else if (Team[i] == "Athletics") {
+    PO[i] = 1
+  }
+  else if (Team[i] == "Royals") {
+    PO[i] = 1
+  }
+  else if (Team[i] == "Angels") {
+    PO[i] = 1
+  }
+  else if (Team[i] == "Orioles") {
+    PO[i] = 1
+  }
+  else if (Team[i] == "Nationals") {
+    PO[i] = 1
+  }
+  else {
+    PO[i] = 0
+  }
+}
+baseball = cbind(baseball, PO)
+PO.1 = subset(baseball, baseball$PO == 1)
+PO.2 = subset(baseball, baseball$PO == 0)
+t.test(PO.1$R, PO.2$R, alternative = "greater")
+
+
+?t.test
+
+t.test(R,PO)
+PO.aov = aov(R ~ PO)
+anova(PO.aov)
+baseball
